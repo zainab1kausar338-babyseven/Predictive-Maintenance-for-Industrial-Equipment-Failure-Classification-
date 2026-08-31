@@ -8,7 +8,7 @@ warnings.filterwarnings('ignore')
 os.makedirs("data_output", exist_ok=True)
 
 # ============ 1. READ RAW DATA ============
-df = pd.read_csv("data_input/predictive_maintenance_dataset.csv") # <- changed this
+df = pd.read_csv("predictive_maintenance_dataset.csv") 
 
 # ============ 2. CLEAN DATA ============
 df.drop(columns=['UDI', 'Product ID'], errors='ignore', inplace=True)
@@ -42,7 +42,6 @@ forecast_df = pd.DataFrame({
 })
 forecast_df.to_csv("data_output/forecast_results.csv", index=False)
 
-# ============ 4. SAVE PLOT ============
 plt.figure(figsize=(12,6))
 plt.plot(df['date'], df['Failure_RollingAvg'], label=f'Rolling Avg {window}', linewidth=2)
 plt.axhline(y=last_avg, color='r', linestyle='--', label=f'Forecast: {last_avg:.3f}')
