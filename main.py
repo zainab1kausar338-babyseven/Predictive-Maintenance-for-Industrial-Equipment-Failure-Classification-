@@ -5,12 +5,10 @@ import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore') # Hides all pandas warnings
 
-# ============ 1. LOAD DATA ============
 df = pd.read_csv("predictive_maintenance_dataset.csv")
 print("Loaded:", df.shape)
 print("\nColumns:", df.columns.tolist())
 
-# ============ 2. DATA CLEANING ============
 print("\n=== 2. DATA CLEANING ===")
 
 df.drop(columns=['UDI', 'Product ID'], errors='ignore', inplace=True)
@@ -33,8 +31,6 @@ df = df.drop_duplicates()
 print(f"Removed {before - len(df)} duplicate rows")
 print("Cleaned Data Shape:", df.shape)
 
-
-# ============ 3. FORECASTING ============
 print("\n=== 3. FORECASTING ===")
 
 target_col = 'failure' # Your screenshot shows it's called 'failure'
@@ -61,5 +57,5 @@ plt.grid(True, alpha=0.3)
 plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig('forecast_plot.png', dpi=150)
-print("\n✅ Saved plot as: forecast_plot.png")
-print("\n=== ALL DONE ===")
+print("\n Saved plot as: forecast_plot.png")
+print("\n ALL DONE ")
