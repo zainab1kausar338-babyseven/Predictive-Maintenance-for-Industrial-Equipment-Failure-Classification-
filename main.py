@@ -10,7 +10,8 @@ print("\nColumns:", df.columns.tolist())
 
 print("\n=== 2. DATA CLEANING ===")
 
-df.drop(columns=['UDI', 'Product ID'], errors='ignore', inplace=True)
+df.drop(columns=['device'], errors='ignore', inplace=True)
+df.drop(columns=['metric6','metric7','metric8','metric9'],errors='ignore',inplace=True)
 
 if 'date' in df.columns:
     df['date'] = pd.to_datetime(df['date'], errors='coerce')
