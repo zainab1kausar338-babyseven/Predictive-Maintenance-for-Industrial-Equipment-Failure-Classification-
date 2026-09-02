@@ -27,18 +27,10 @@ before = len(df)
 df = df.drop_duplicates()
 print(f"Removed {before - len(df)} duplicates")
 
-print("\n=== 6. INVALID DATA ===")
-df.drop(columns=['device', 'metric6', 'metric7', 'metric8', 'metric9'], errors='ignore', inplace=True)
-
-for col in ['metric1', 'metric2', 'metric3', 'metric4', 'metric5']:
-    if col in df.columns:
-        Q1, Q3 = df[col].quantile(0.25), df[col].quantile(0.75)
-        IQR = Q3 - Q1
-        df[col] = np.clip(df[col], Q1 - 1.5*IQR, Q3 + 1.5*IQR)
 
 print("\n=== 7. FINAL ===")
 print("Cleaned Shape:", df.shape)
 print("Missing:", df.isnull().sum().sum())
 print(df.head())
-df.to_csv("cleaned_predictive_maintenance.csv", index=False)
-print("\n✅ Saved as: cleaned_predictive_maintenance.csv")
+df.to_csv("cleaned_predictive_maintenance_dataset.csv", index=False)
+print("\n✅ Saved as: cleaned_predictive_maintenance_dataset.csv")
