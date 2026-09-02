@@ -27,6 +27,33 @@ before = len(df)
 df = df.drop_duplicates()
 print(f"Removed {before - len(df)} duplicates")
 
+print("\n=== 6. RENAME METRICS + CONVERT TO KELVIN ===")
+
+# RENAME METRICS TO REAL NAMES
+df = df.rename(columns={
+    'metric1': 'Air_Temp_C',      
+    'metric2': 'Process_Temp_C',  
+    'metric3': 'Rotational_Speed', 
+    'metric4': 'Torque',
+    'metric5': 'Tool_Wear',
+    'metric6': 'Pressure',
+    'metric7': 'Vibration',
+    'metric8': 'Voltage',
+    'metric9': 'Current' })
+print("New Columns:", df.columns.tolist())
+
+     # CONVERT C TO KELVIN: K = C + 273.15
+df['Air_Temp_K'] = df['Air_Temp_C'] + 273.15
+df['Process_Temp_K'] = df['Process_Temp_C'] + 273.15
+
+     # ADD ENGINEERING LIMIT FLAGS
+df['Air_Temp_Alert'] = np.where(df['Air_Temp_K'] > 320, 1, 0)      # > 47C
+df['Process_Temp_Alert'] = np.where(df['Process_Temp_K'] > 350, 1, 0) # > 77C
+df['Critical_Temp_Flag'] = np.where(df['Process_Temp_K'] > 373, 1, 0) # > 100C = 373K
+df['RPM_Alert'] = np.where(df['Rotational_Speed'] > 4000, 1, 0)
+df['Tool_Wear_Alert'] = np.where(df['Tool_Wear'] > 200, 1, 0)
+
+print("Added Kelvin columns and Alert flags")
 
 print("\n=== 7. FINAL ===")
 print("Cleaned Shape:", df.shape)
