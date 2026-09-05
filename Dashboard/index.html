@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fleet Watch — Predictive Maintenance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <h1>Fleet Watch</h1>
+    <span class="sub">predictive maintenance · 2015-01-01 – 2016-12-31</span>
+  </div>
+  <div class="status-pill"><span class="status-dot"></span>MONITORING ACTIVE</div>
+</div>
+
+<div class="wrap">
+
+  <div class="kpis" id="kpiRow"></div>
+
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Live sensor feed</h2>
+        <div class="feed-controls">
+          <button class="btn active" id="playBtn">Pause</button>
+          <button class="btn" id="forceBtn">Simulate failure</button>
+        </div>
+      </div>
+      <div class="panel-body" style="padding:0 18px;">
+        <div class="live-feed" id="liveFeed"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Alert log</h2>
+        <span class="meta" id="alertCount">0 active</span>
+      </div>
+      <div class="panel-body" style="padding:8px 18px;">
+        <div class="alert-log" id="alertLog"><div class="empty-note">No alerts yet. The feed will flag a device the moment its risk score crosses the critical threshold.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid thirds">
+    <div class="panel">
+      <div class="panel-head"><h2>Monthly failure rate</h2><span class="meta">24 months</span></div>
+      <div class="panel-body"><div class="chart-box"><canvas id="trendChart"></canvas></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Model comparison</h2><span class="meta">from evaluation results</span></div>
+      <div class="panel-body"><div class="chart-box"><canvas id="modelChart"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="grid thirds">
+    <div class="panel">
+      <div class="panel-head"><h2>Torque distribution</h2><span class="meta">by outcome</span></div>
+      <div class="panel-body"><div class="chart-box"><canvas id="torqueChart"></canvas></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Feature importance</h2><span class="meta">logistic regression, approx.</span></div>
+      <div class="panel-body"><div class="chart-box tall"><canvas id="featChart"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Fleet — 72 devices</h2>
+      <span class="meta" id="fleetMeta"></span>
+    </div>
+    <div class="panel-body">
+      <input class="table-search" id="deviceSearch" placeholder="Filter by device id…">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th data-key="device">Device</th>
+              <th data-key="failure_rate">Failure rate</th>
+              <th data-key="records">Records</th>
+              <th data-key="failures">Failures</th>
+              <th data-key="avg_torque">Avg torque</th>
+              <th data-key="avg_vibration">Avg vibration</th>
+              <th data-key="avg_current">Avg current</th>
+              <th data-key="avg_process_temp">Avg proc. temp</th>
+            </tr>
+          </thead>
+          <tbody id="fleetBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer>Risk scores are a rule-based estimate derived from this dataset's own feature/failure correlations — not a live read of the saved model file. Model comparison &amp; feature-importance figures are approximate, read from the provided evaluation charts.</footer>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2L1 21h22L12 2z" stroke="#FF8177" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9v5" stroke="#FF8177" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="#FF8177"/></svg>
+      <div>
+        <h3>Tool failure risk — critical</h3>
+        <div class="sub" id="modalSub">device · timestamp</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="gauge-wrap">
+        <div class="gauge-track"><div class="gauge-fill" id="gaugeFill" style="width:0%"></div></div>
+        <div class="gauge-label"><span>0</span><span id="gaugeVal">risk score</span><span>100</span></div>
+      </div>
+      <div class="modal-row"><span class="k">Device</span><span class="v" id="mDevice">—</span></div>
+      <div class="modal-row"><span class="k">Torque</span><span class="v" id="mTorque">—</span></div>
+      <div class="modal-row"><span class="k">Vibration</span><span class="v" id="mVibration">—</span></div>
+      <div class="modal-row"><span class="k">Current</span><span class="v" id="mCurrent">—</span></div>
+      <div class="modal-row"><span class="k">Process temp.</span><span class="v" id="mTemp">—</span></div>
+      <div class="modal-row"><span class="k">Primary driver</span><span class="v hot" id="mDriver">—</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ack" id="ackBtn">Acknowledge</button>
+      <button class="btn-dispatch" id="dispatchBtn">Dispatch technician</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
